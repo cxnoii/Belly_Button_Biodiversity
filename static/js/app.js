@@ -34,9 +34,41 @@ function changeData(current_id) {
 function gauge(data, current_id) {
     var metadata = data.metadata;
     var result = metadata.filter(obj => {
-        return parseInt(obj.id === parseInt(current_id));
+        return parseInt(obj.id) === parseInt(current_id)
     })
-    console.log('wash frequency', result)
+
+    var washFreq = result[0].wfreq;
+
+    var data = [
+        {
+            domain: { x: [0, 1], y: [0, 1] },
+            value: washFreq,
+            title: {text: "<b>Belly Button Wash Frequency</b><br>Scrubs per Week"},
+            type: "indicator",
+            mode: "gauge+number",
+            gauge: {
+                axis: {range: [null, 9]},
+                steps: [
+                    {range: [0,1], color:"#D0E4D8"},
+                    {range: [1,2], color:"#B0D2BE"},
+                    {range: [2,3], color:"#91C0A6"},
+                    {range: [3,4], color:"#73AD8E"},
+                    {range: [4,5], color:"#549977"},
+                    {range: [5,6], color:"#368661"},
+                    {range: [6,7], color:"#2C7345"},
+                    {range: [7,8], color:"#235F2D"},
+                    {range: [8,9], color:"#1A4B1A"}
+                ]
+                ,bar: {color: "#32cd32"}
+            }
+        }
+    ];
+    
+    var layout = { width: 600, height: 500, margin: { t: 0, b: 0 } };
+
+    Plotly.newPlot('gauge', data, layout);
+
+    
 
 }
 
@@ -49,11 +81,7 @@ function bubble(data, current_id) {
     var sampleValues = result[0].sample_values.slice(0,10);
     var otuId = result[0].otu_ids.slice(0,10); 
 
-    var bar_labels = otuId.map( function(id) {
-        return `OTU${id}`;
-    })
-
-    let hover_labels = result[0].otu_labels.slice(0,10);
+    var hover_labels = result[0].otu_labels.slice(0,10);
 
     let bubble = [{
         x: otuId,
@@ -66,9 +94,13 @@ function bubble(data, current_id) {
             sizeref: 2.0 * Math.max(sampleValues) / (100**2),
         }
     }]
+
+    layout = {
+        title: "All OTUs in Subject"
+    }
     
 
-    Plotly.newPlot("bubble", bubble)
+    Plotly.newPlot("bubble", bubble,layout)
 
     console.log("Object passed into bubble", data);
 }
@@ -84,7 +116,7 @@ function topTenOTUs(data, current_id) {
     var otuId = result[0].otu_ids.slice(0,10); 
 
     var bar_labels = otuId.map( function(id) {
-        return `OTU${id}`;
+        return `OTU ${id}`;
     })
 
     let hover_labels = result[0].otu_labels.slice(0,10);
@@ -95,11 +127,11 @@ function topTenOTUs(data, current_id) {
         y: bar_labels,
         type: 'bar',
         orientation: 'h',
-        text: hover_labels
+        text: hover_labels,
     }]
 
     let layout = {
-        title: "Top Ten OTUs",
+        title: "Top Ten Most Prevalent OTUs",
         font : {family: "Arial"},
         yaxis: {tickangle: -15}
 
